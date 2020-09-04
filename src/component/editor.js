@@ -138,7 +138,7 @@ function suggestItemClick(it) {
     } else {
       eit = '';
     }
-    this.inputText = `${sit + it.key}(`;
+    this.inputText = `${sit + it}(`;
     // console.log('inputText:', this.inputText);
     position = this.inputText.length;
     this.inputText += `)${eit}`;

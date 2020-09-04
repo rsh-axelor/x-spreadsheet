@@ -13,7 +13,8 @@ import ModalValidation from './modal_validation';
 import SortFilter from './sort_filter';
 import { xtoast } from './message';
 import { cssPrefix } from '../config';
-import { formulas } from '../core/formula';
+
+import { SUPPORTED_FORMULAS } from 'hot-formula-parser';
 
 /**
  * @desc throttle fn
@@ -859,7 +860,7 @@ export default class Sheet {
     this.horizontalScrollbar = new Scrollbar(false);
     // editor
     this.editor = new Editor(
-      formulas,
+      SUPPORTED_FORMULAS,
       () => this.getTableOffset(),
       data.rows.height,
     );
