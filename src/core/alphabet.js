@@ -39,7 +39,15 @@ export function indexAt(str) {
   return ret;
 }
 
-// B10 => x,y
+// Regex looks for:
+// [1] Optional $ (absolute X symbol)
+// [2] 1-3 letters representing the column (X)
+// [3] Optional $ (absolute Y symbol)
+// [4] Sequence of digits representing the row (Y)
+export const REGEX_EXPR_GLOBAL  = /[$]?[a-zA-Z]{1,3}[$]?\d+/g;
+       const REGEX_EXPR_CAPTURE = /([$])?([a-zA-Z]{1,3})([$])?(\d+)/;
+
+// B10 => x,y,xIsAbsolute,yIsAbsolute
 /** translate A1-tag to XY-tag
  * @date 2019-10-10
  * @export
@@ -47,16 +55,26 @@ export function indexAt(str) {
  * @returns {tagXY}
  */
 export function expr2xy(src) {
+  let xIsAbsolute = false;
   let x = '';
+  let yIsAbsolute = false;
   let y = '';
-  for (let i = 0; i < src.length; i += 1) {
-    if (src.charAt(i) >= '0' && src.charAt(i) <= '9') {
-      y += src.charAt(i);
-    } else {
-      x += src.charAt(i);
-    }
+
+  // Regex looks for:
+  // [1] Optional $ (absolute X symbol)
+  // [2] 1-3 letters representing the column (X)
+  // [3] Optional $ (absolute Y symbol)
+  // [4] Sequence of digits representing the row (Y)
+  const found = src.match(REGEX_EXPR_CAPTURE);
+
+  if (found) {
+    xIsAbsolute = found[1] !== undefined;
+    x = found[2];
+    yIsAbsolute = found[3] !== undefined;
+    y = found[4];
   }
-  return [indexAt(x), parseInt(y, 10) - 1];
+
+  return [indexAt(x), parseInt(y, 10) - 1, xIsAbsolute, yIsAbsolute];
 }
 
 /** translate XY-tag to A1-tag
@@ -67,8 +85,9 @@ export function expr2xy(src) {
  * @param {number} y
  * @returns {tagA1}
  */
-export function xy2expr(x, y) {
-  return `${stringAt(x)}${y + 1}`;
+export function xy2expr(x, y, xIsAbsolute = false, yIsAbsolute = false) {
+  const insertAbs = function(isAbsolute) { return (isAbsolute) ? '$' : '' };
+  return `${insertAbs(xIsAbsolute)}${stringAt(x)}${insertAbs(yIsAbsolute)}${y + 1}`;
 }
 
 /** translate A1-tag src by (xn, yn)
@@ -77,13 +96,21 @@ export function xy2expr(x, y) {
  * @param {tagA1} src
  * @param {number} xn
  * @param {number} yn
+ * @param {Boolean} dontTranslateAbsolute
  * @returns {tagA1}
  */
-export function expr2expr(src, xn, yn, condition = () => true) {
+export function expr2expr(src, xn, yn, translateAbsolute = false, condition = () => true) {
   if (xn === 0 && yn === 0) return src;
-  const [x, y] = expr2xy(src);
+  const [x, y, xIsAbsolute, yIsAbsolute] = expr2xy(src);
+
+  if (!translateAbsolute) {
+    // Ignore translation request if axis is absolute
+    if (xIsAbsolute) xn = 0;
+    if (yIsAbsolute) yn = 0;
+  }
+
   if (!condition(x, y)) return src;
-  return xy2expr(x + xn, y + yn);
+  return xy2expr(x + xn, y + yn, xIsAbsolute, yIsAbsolute);
 }
 
 export default {
@@ -92,4 +119,5 @@ export default {
   expr2xy,
   xy2expr,
   expr2expr,
+  REGEX_EXPR_GLOBAL,
 };
