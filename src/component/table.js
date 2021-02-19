@@ -362,9 +362,16 @@ class Table {
         let model = functionParams[0];
         let fields = functionParams[1].split(",").map((item) => item.trim());
         // let _domain = "";
-        let limit = "10"; //params[0]
+        let limit = Number(functionParams[2]) || 10;
+        let _domain = functionParams[3];
+        let data = {};
+        if (_domain) {
+          _domain = _domain.replace(/[\u{0080}-\u{FFFF}]/gu, " ");
+          data._domain = _domain;
+        }
         Service.search(model, {
           fields,
+          data,
           limit,
         }).then((res) => {
           if (res.status === 0 && res.data) {
