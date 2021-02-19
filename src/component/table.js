@@ -6,6 +6,7 @@ import { formatm } from "../core/format";
 import { Draw, DrawBox, thinLineWidth, npx } from "../canvas/draw";
 
 import { Parser } from "hot-formula-parser";
+import Service from "../services";
 
 // gobal var
 const cellPaddingWidth = 5;
@@ -335,8 +336,65 @@ class Table {
       return Number(cellText) || cellText;
     };
 
-    this.formulaParser.setFunction("AXELOR", (params) => {
-      return params + " from Axelor";
+    /**
+     *  Example
+     * "com.axelor.apps.base.db.Partner","fullName,fixedPhone"
+     * "com.axelor.apps.sale.db.SaleOrder","company.name,inTaxTotal"
+     * "com.axelor.apps.crm.db.Lead","fullName,name"
+     */
+
+    this.formulaParser.setFunction("AXELOR", (functionParams) => {
+      let rowIndex = this.data.selector.ri;
+      let columnIndex = this.data.selector.ci;
+      const cell = this.data.getCell(rowIndex, columnIndex);
+      if (
+        cell &&
+        cell.text &&
+        cell.text.includes("=AXELOR") &&
+        (!cell.isValueFetched || cell.oldText !== cell.text)
+      ) {
+        let paramsStr = cell.text.substring(
+          cell.text.lastIndexOf("(") + 1,
+          cell.text.lastIndexOf(")")
+        );
+        let noQuotes = paramsStr.split('"').join("");
+        if (functionParams.toString() !== noQuotes) return "";
+        let model = functionParams[0];
+        let fields = functionParams[1].split(",").map((item) => item.trim());
+        // let _domain = "";
+        let limit = "10"; //params[0]
+        Service.search(model, {
+          fields,
+          limit,
+        }).then((res) => {
+          if (res.status === 0 && res.data) {
+            cell.isValueFetched = true;
+            cell.functionRowIndex = rowIndex;
+            cell.functionColumnIndex = columnIndex;
+            cell.oldText = cell.text;
+            fields.forEach((field, i) => {
+              this.data.setCellText(
+                cell.functionRowIndex + 1,
+                cell.functionColumnIndex + i,
+                field
+              );
+              res.data.forEach((rec, recIndex) => {
+                this.data.setCellText(
+                  cell.functionRowIndex + 1 + recIndex + 1,
+                  cell.functionColumnIndex + i,
+                  rec[field]
+                );
+              });
+            });
+          } else {
+            cell.isValueFetched = false;
+            cell.functionRowIndex = undefined;
+            cell.functionColumnIndex = undefined;
+          }
+        });
+        return "";
+      }
+      return "";
     });
 
     this.formulaParser.on("callCellValue", function (cellCoord, done) {
