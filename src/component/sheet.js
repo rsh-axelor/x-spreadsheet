@@ -14,7 +14,7 @@ import ModalValidation from './modal_validation';
 import SortFilter from './sort_filter';
 import { xtoast } from './message';
 import { cssPrefix } from '../config';
-
+import { createEventEmitter } from "./event"
 import { SUPPORTED_FORMULAS } from 'hot-formula-parser';
 
 /**
