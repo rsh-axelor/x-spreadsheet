@@ -1,35 +1,35 @@
 /* global window */
 
-import Align from './align';
-import Valign from './valign';
-import Autofilter from './autofilter';
-import Bold from './bold';
-import Italic from './italic';
-import Strike from './strike';
-import Underline from './underline';
-import Border from './border';
-import Clearformat from './clearformat';
-import Paintformat from './paintformat';
-import TextColor from './text_color';
-import FillColor from './fill_color';
-import FontSize from './font_size';
-import Font from './font';
-import Format from './format';
-import Formula from './formula';
-import Freeze from './freeze';
-import Merge from './merge';
-import Redo from './redo';
-import Undo from './undo';
-import Print from './print';
-import Textwrap from './textwrap';
-import More from './more';
+import Align from "./align";
+import Valign from "./valign";
+import Autofilter from "./autofilter";
+import Bold from "./bold";
+import Italic from "./italic";
+import Strike from "./strike";
+import Underline from "./underline";
+import Border from "./border";
+import Clearformat from "./clearformat";
+import Paintformat from "./paintformat";
+import TextColor from "./text_color";
+import FillColor from "./fill_color";
+import FontSize from "./font_size";
+import Font from "./font";
+import Format from "./format";
+import Formula from "./formula";
+import Freeze from "./freeze";
+import Merge from "./merge";
+import Redo from "./redo";
+import Undo from "./undo";
+import Print from "./print";
+import Textwrap from "./textwrap";
+import More from "./more";
 
-import { h } from '../element';
-import { cssPrefix } from '../../config';
-import { bind } from '../event';
+import { h } from "../element";
+import { cssPrefix } from "../../config";
+import { bind } from "../event";
 
 function buildDivider() {
-  return h('div', `${cssPrefix}-toolbar-divider`);
+  return h("div", `${cssPrefix}-toolbar-divider`);
 }
 
 function initBtns2() {
@@ -39,22 +39,26 @@ function initBtns2() {
       it.forEach(({ el }) => {
         const rect = el.box();
         const { marginLeft, marginRight } = el.computedStyle();
-        this.btns2.push([el, rect.width + parseInt(marginLeft, 10) + parseInt(marginRight, 10)]);
+        this.btns2.push([
+          el,
+          rect.width + parseInt(marginLeft, 10) + parseInt(marginRight, 10),
+        ]);
       });
     } else {
       const rect = it.box();
       const { marginLeft, marginRight } = it.computedStyle();
-      this.btns2.push([it, rect.width + parseInt(marginLeft, 10) + parseInt(marginRight, 10)]);
+      this.btns2.push([
+        it,
+        rect.width + parseInt(marginLeft, 10) + parseInt(marginRight, 10),
+      ]);
     }
   });
 }
 
 function moreResize() {
-  const {
-    el, btns, moreEl, btns2,
-  } = this;
+  const { el, btns, moreEl, btns2 } = this;
   const { moreBtns, contentEl } = moreEl.dd;
-  el.css('width', `${this.widthFn() - 60}px`);
+  el.css("width", `${this.widthFn() - 60}px`);
   const elBox = el.box();
 
   let sumWidth = 160;
@@ -70,9 +74,9 @@ function moreResize() {
       list2.push(it);
     }
   });
-  btns.html('').children(...list1);
-  moreBtns.html('').children(...list2);
-  contentEl.css('width', `${sumWidth2}px`);
+  btns.html("").children(...list1);
+  moreBtns.html("").children(...list2);
+  contentEl.css("width", `${sumWidth2}px`);
   if (list2.length > 0) {
     moreEl.show();
   } else {
@@ -89,52 +93,47 @@ export default class Toolbar {
     const style = data.defaultStyle();
     this.items = [
       [
-        this.undoEl = new Undo(),
-        this.redoEl = new Redo(),
+        (this.undoEl = new Undo()),
+        (this.redoEl = new Redo()),
         new Print(),
-        this.paintformatEl = new Paintformat(),
-        this.clearformatEl = new Clearformat(),
+        (this.paintformatEl = new Paintformat()),
+        (this.clearformatEl = new Clearformat()),
+      ],
+      buildDivider(),
+      [(this.formatEl = new Format())],
+      buildDivider(),
+      [(this.fontEl = new Font()), (this.fontSizeEl = new FontSize())],
+      buildDivider(),
+      [
+        (this.boldEl = new Bold()),
+        (this.italicEl = new Italic()),
+        (this.underlineEl = new Underline()),
+        (this.strikeEl = new Strike()),
+        (this.textColorEl = new TextColor(style.color)),
       ],
       buildDivider(),
       [
-        this.formatEl = new Format(),
+        (this.fillColorEl = new FillColor(style.bgcolor)),
+        (this.borderEl = new Border()),
+        (this.mergeEl = new Merge()),
       ],
       buildDivider(),
       [
-        this.fontEl = new Font(),
-        this.fontSizeEl = new FontSize(),
+        (this.alignEl = new Align(style.align)),
+        (this.valignEl = new Valign(style.valign)),
+        (this.textwrapEl = new Textwrap()),
       ],
       buildDivider(),
       [
-        this.boldEl = new Bold(),
-        this.italicEl = new Italic(),
-        this.underlineEl = new Underline(),
-        this.strikeEl = new Strike(),
-        this.textColorEl = new TextColor(style.color),
-      ],
-      buildDivider(),
-      [
-        this.fillColorEl = new FillColor(style.bgcolor),
-        this.borderEl = new Border(),
-        this.mergeEl = new Merge(),
-      ],
-      buildDivider(),
-      [
-        this.alignEl = new Align(style.align),
-        this.valignEl = new Valign(style.valign),
-        this.textwrapEl = new Textwrap(),
-      ],
-      buildDivider(),
-      [
-        this.freezeEl = new Freeze(),
-        this.autofilterEl = new Autofilter(),
-        this.formulaEl = new Formula(),
-        this.moreEl = new More(),
+        (this.freezeEl = new Freeze()),
+        (this.autofilterEl = new Autofilter()),
+        (this.formulaEl = new Formula()),
+        (this.moreEl = new More()),
       ],
     ];
 
-    this.el = h('div', `${cssPrefix}-toolbar`);
-    this.btns = h('div', `${cssPrefix}-toolbar-btns`);
+    this.el = h("div", `${cssPrefix}-toolbar`);
+    this.btns = h("div", `${cssPrefix}-toolbar-btns`);
 
     this.items.forEach((it) => {
       if (Array.isArray(it)) {
@@ -158,7 +157,7 @@ export default class Toolbar {
         initBtns2.call(this);
         moreResize.call(this);
       }, 0);
-      bind(window, 'resize', () => {
+      bind(window, "resize", () => {
         moreResize.call(this);
       });
     }

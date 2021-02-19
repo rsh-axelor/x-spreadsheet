@@ -1,6 +1,33 @@
-import './_.prototypes';
+import "./_.prototypes";
 
-const alphabets = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+const alphabets = [
+  "A",
+  "B",
+  "C",
+  "D",
+  "E",
+  "F",
+  "G",
+  "H",
+  "I",
+  "J",
+  "K",
+  "L",
+  "M",
+  "N",
+  "O",
+  "P",
+  "Q",
+  "R",
+  "S",
+  "T",
+  "U",
+  "V",
+  "W",
+  "X",
+  "Y",
+  "Z",
+];
 
 /** index number 2 letters
  * @example stringAt(26) ==> 'AA'
@@ -10,7 +37,7 @@ const alphabets = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', '
  * @returns {string}
  */
 export function stringAt(index) {
-  let str = '';
+  let str = "";
   let cindex = index;
   do {
     str = alphabets[parseInt(cindex, 10) % alphabets.length] + str;
@@ -31,7 +58,7 @@ export function indexAt(str) {
   for (let i = 0; i <= str.length - 1; i += 1) {
     const cindex = str.charCodeAt(i) - 65;
     const exponet = str.length - 1 - i;
-    ret += (cindex + 1) * (alphabets.length ** exponet);
+    ret += (cindex + 1) * alphabets.length ** exponet;
   }
   ret -= 1;
   return ret;
@@ -42,10 +69,10 @@ export function indexAt(str) {
 // [2] 1-3 letters representing the column (X)
 // [3] Optional $ (absolute Y symbol)
 // [4] Sequence of digits representing the row (Y), first digit cannot be 0
-export const REGEX_EXPR_GLOBAL                   = /[$]?[a-zA-Z]{1,3}[$]?[1-9][0-9]*/g;
-export const REGEX_EXPR_NONGLOBAL_AT_START       = /^[$]?[a-zA-Z]{1,3}[$]?[1-9][0-9]*/;
+export const REGEX_EXPR_GLOBAL = /[$]?[a-zA-Z]{1,3}[$]?[1-9][0-9]*/g;
+export const REGEX_EXPR_NONGLOBAL_AT_START = /^[$]?[a-zA-Z]{1,3}[$]?[1-9][0-9]*/;
 export const REGEX_EXPR_RANGE_NONGLOBAL_AT_START = /^[$]?[a-zA-Z]{1,3}[$]?[1-9][0-9]*:[$]?[a-zA-Z]{1,3}[$]?[1-9][0-9]*/;
-       const REGEX_EXPR_NONGLOBAL_CAPTURE        = /([$])?([a-zA-Z]{1,3})([$])?([1-9][0-9]*)/;
+const REGEX_EXPR_NONGLOBAL_CAPTURE = /([$])?([a-zA-Z]{1,3})([$])?([1-9][0-9]*)/;
 
 // B10 => x,y,xIsAbsolute,yIsAbsolute,length of expr
 /** translate A1-tag to XY-tag
@@ -71,7 +98,13 @@ export function expr2xy(src) {
   const yIsAbsolute = found[3] !== undefined;
   const y = found[4];
 
-  return [indexAt(x), parseInt(y, 10) - 1, xIsAbsolute, yIsAbsolute, found[0].length];
+  return [
+    indexAt(x),
+    parseInt(y, 10) - 1,
+    xIsAbsolute,
+    yIsAbsolute,
+    found[0].length,
+  ];
 }
 
 /** translate tagA1B2 to cell range arguments (sri, sci, eri, eci)
@@ -95,7 +128,10 @@ export function expr2cellRangeArgs(src) {
   // If we've reached the end of the string OR
   // if the next character after start reference is not a colon,
   // then we just have a start reference (no end)
-  if (srcIndexEndOfStartRef >= src.length || src[srcIndexEndOfStartRef] != ':') {
+  if (
+    srcIndexEndOfStartRef >= src.length ||
+    src[srcIndexEndOfStartRef] != ":"
+  ) {
     return [sri, sci, sri, sci];
   }
 
@@ -120,8 +156,12 @@ export function expr2cellRangeArgs(src) {
  * @returns {tagA1}
  */
 export function xy2expr(x, y, xIsAbsolute = false, yIsAbsolute = false) {
-  const insertAbs = function(isAbsolute) { return (isAbsolute) ? '$' : '' };
-  return `${insertAbs(xIsAbsolute)}${stringAt(x)}${insertAbs(yIsAbsolute)}${y + 1}`;
+  const insertAbs = function (isAbsolute) {
+    return isAbsolute ? "$" : "";
+  };
+  return `${insertAbs(xIsAbsolute)}${stringAt(x)}${insertAbs(yIsAbsolute)}${
+    y + 1
+  }`;
 }
 
 /** translate cell range arguments to cell range string expression
@@ -153,7 +193,13 @@ export function cellRangeArgs2expr(sri, sci, eri, eci) {
  * @param {Boolean} dontTranslateAbsolute
  * @returns {tagA1}
  */
-export function expr2expr(src, xn, yn, translateAbsolute = false, condition = () => true) {
+export function expr2expr(
+  src,
+  xn,
+  yn,
+  translateAbsolute = false,
+  condition = () => true
+) {
   if (xn === 0 && yn === 0) return src;
   const [x, y, xIsAbsolute, yIsAbsolute] = expr2xy(src);
 

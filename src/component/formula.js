@@ -4,10 +4,10 @@ import {
   expr2cellRangeArgs,
   cellRangeArgs2expr,
   REGEX_EXPR_NONGLOBAL_AT_START,
-  REGEX_EXPR_RANGE_NONGLOBAL_AT_START
-} from '../core/alphabet';
-import { setCaretPosition, getCaretPosition } from '../core/caret';
-import CellRange from '../core/cell_range';
+  REGEX_EXPR_RANGE_NONGLOBAL_AT_START,
+} from "../core/alphabet";
+import { setCaretPosition, getCaretPosition } from "../core/caret";
+import CellRange from "../core/cell_range";
 
 function renderCell(left, top, width, height, color, selected = false) {
   let style = `position:absolute;box-sizing: border-box;`;
@@ -61,7 +61,7 @@ export default class Formula {
       if (document.activeElement !== this.el) return;
 
       this.cell = null;
-      if (this.editor.inputText[0] != '=') return;
+      if (this.editor.inputText[0] != "=") return;
 
       const index = getCaretPosition(this.el);
       for (let cell of this.cells) {
@@ -84,13 +84,17 @@ export default class Formula {
       // In either case, update the start/end select accordingly.
       // TODO: find a more reliable way to check a change of cell than by using
       //       the color property
-      if (this.cell && this.cell.color &&
-         (this.cell.color !== cellLastSelectionColor || !this.cellSelectStartRowCol)) {
-          const cellRange = this.getCellPositionRange(this.cell);
-          this.cellSelectStartRowCol = [cellRange.sri, cellRange.sci];
-          this.cellSelectEndRowCol = [cellRange.eri, cellRange.eci];
+      if (
+        this.cell &&
+        this.cell.color &&
+        (this.cell.color !== cellLastSelectionColor ||
+          !this.cellSelectStartRowCol)
+      ) {
+        const cellRange = this.getCellPositionRange(this.cell);
+        this.cellSelectStartRowCol = [cellRange.sri, cellRange.sci];
+        this.cellSelectEndRowCol = [cellRange.eri, cellRange.eci];
 
-          cellLastSelectionColor = this.cell.color;
+        cellLastSelectionColor = this.cell.color;
       }
 
       this.renderCells();
@@ -128,11 +132,23 @@ export default class Formula {
 
       // If the shift key is applied, hold the start position fixed
       if (!e.shiftKey) {
-        this.cellSelectStartRowCol[0] = Math.max(0, this.cellSelectStartRowCol[0] + rowShift);
-        this.cellSelectStartRowCol[1] = Math.max(0, this.cellSelectStartRowCol[1] + colShift);
+        this.cellSelectStartRowCol[0] = Math.max(
+          0,
+          this.cellSelectStartRowCol[0] + rowShift
+        );
+        this.cellSelectStartRowCol[1] = Math.max(
+          0,
+          this.cellSelectStartRowCol[1] + colShift
+        );
       }
-      this.cellSelectEndRowCol[0]   = Math.max(0, this.cellSelectEndRowCol[0]   + rowShift);
-      this.cellSelectEndRowCol[1]   = Math.max(0, this.cellSelectEndRowCol[1]   + colShift);
+      this.cellSelectEndRowCol[0] = Math.max(
+        0,
+        this.cellSelectEndRowCol[0] + rowShift
+      );
+      this.cellSelectEndRowCol[1] = Math.max(
+        0,
+        this.cellSelectEndRowCol[1] + colShift
+      );
 
       // Get values before merge cells applied
       const cellRangeArgs = this.getCellRangeArgsFromSelectStartEnd();
@@ -141,9 +157,15 @@ export default class Formula {
       let cellRange = new CellRange(...cellRangeArgs);
 
       // Reapply merge cells after translation
-      cellRange = this.editor.data.merges.union(cellRange)
+      cellRange = this.editor.data.merges.union(cellRange);
 
-      generalSelectCell.call(this, cellRange.sri, cellRange.sci, cellRange.eri, cellRange.eci);
+      generalSelectCell.call(
+        this,
+        cellRange.sri,
+        cellRange.sci,
+        cellRange.eri,
+        cellRange.eci
+      );
     });
   }
 
@@ -152,7 +174,7 @@ export default class Formula {
     this.cellSelectStartRowCol = null;
     this.cellSelectEndRowCol = null;
     this.cells = [];
-    this.cellEl.innerHTML = '';
+    this.cellEl.innerHTML = "";
   }
 
   selectCell(ri, ci) {
@@ -180,18 +202,18 @@ export default class Formula {
   }
 
   getCellRangeArgsFromSelectStartEnd() {
-      // Normalize so that start index is not larger than the end index
-      let [sri, sci] = this.cellSelectStartRowCol;
-      let [eri, eci] = this.cellSelectEndRowCol;
+    // Normalize so that start index is not larger than the end index
+    let [sri, sci] = this.cellSelectStartRowCol;
+    let [eri, eci] = this.cellSelectEndRowCol;
 
-      if (sri > eri) {
-        [sri, eri] = [eri, sri];
-      }
-      if (sci > eci) {
-        [sci, eci] = [eci, sci];
-      }
+    if (sri > eri) {
+      [sri, eri] = [eri, sri];
+    }
+    if (sci > eci) {
+      [sci, eci] = [eci, sci];
+    }
 
-      return [sri, sci, eri, eci];
+    return [sri, sci, eri, eci];
   }
 
   render() {
@@ -258,7 +280,7 @@ export default class Formula {
             to: i,
           });
         }
-        if (text[i - 1] == '(') {
+        if (text[i - 1] == "(") {
           // between '(' and operator
           this.cells.push({
             from: i,
@@ -270,14 +292,14 @@ export default class Formula {
       } else if ((m = sub.match(/^[\(\)]/))) {
         // parenthesis
         html += `<span class="formula-token">${m[0]}</span>`;
-        if (text[i - 1] == '(' && text[i] == ')') {
+        if (text[i - 1] == "(" && text[i] == ")") {
           // between parenthesis pair
           this.cells.push({
             from: i,
             to: i,
           });
         }
-        if (pre == 4 && text[i] == ')') {
+        if (pre == 4 && text[i] == ")") {
           // between operator and ')'
           this.cells.push({
             from: i,
@@ -294,7 +316,7 @@ export default class Formula {
       }
     }
 
-    const afterOpenParen = (pre == 5) && (text[i - 1] == '(');
+    const afterOpenParen = pre == 5 && text[i - 1] == "(";
     if (pre == 4 || afterOpenParen) {
       // between operator and the end of text
       this.cells.push({
@@ -319,7 +341,14 @@ export default class Formula {
         const cellRangeIncludingMerges = data.merges.union(cellRange);
         const box = data.getRect(cellRangeIncludingMerges);
         const { left, top, width, height } = box;
-        cellHtml += renderCell(left, top, width, height, color, this.cell === cell);
+        cellHtml += renderCell(
+          left,
+          top,
+          width,
+          height,
+          color,
+          this.cell === cell
+        );
       }
     }
 
