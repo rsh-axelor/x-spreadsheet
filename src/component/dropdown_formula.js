@@ -7,11 +7,12 @@ import { SUPPORTED_FORMULAS } from 'hot-formula-parser';
 
 export default class DropdownFormula extends Dropdown {
   constructor() {
-    const nformulas = SUPPORTED_FORMULAS.map(it => h('div', `${cssPrefix}-item`)
-      .on('click', () => {
-        this.hide();
-        this.change(it);
-      })
+    const nformulas = ["AXELOR", ...SUPPORTED_FORMULAS].sort().map((it) =>
+      h("div", `${cssPrefix}-item`)
+        .on("click", () => {
+          this.hide();
+          this.change(it);
+        })
       .child(it));
     super(new Icon('formula'), '180px', true, 'bottom-left', ...nformulas);
   }

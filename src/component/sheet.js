@@ -892,12 +892,13 @@ export default class Sheet {
     this.verticalScrollbar = new Scrollbar(true);
     this.horizontalScrollbar = new Scrollbar(false);
     // editor
-    const formulaSuggestions = SUPPORTED_FORMULAS.map((formulaName) => {
-      const escapedFormulaName = formulaName.replace('.', '\\.');
-      return {
-        key: escapedFormulaName,
-        // Function that returns translation of the formula name if one exists,
-        // otherwise the formula name
+    const formulaSuggestions = [...SUPPORTED_FORMULAS, "AXELOR"].map(
+      (formulaName) => {
+        const escapedFormulaName = formulaName.replace(".", "\\.");
+        return {
+          key: escapedFormulaName,
+          // Function that returns translation of the formula name if one exists,
+          // otherwise the formula name
         title: () => t(`formula.${escapedFormulaName}`) || formulaName
       };
     });

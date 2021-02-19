@@ -336,6 +336,10 @@ class Table {
       return Number(cellText) || cellText;
     }
 
+    this.formulaParser.setFunction("AXELOR", (params) => {
+      return params + " from Axelor";
+    });
+
     this.formulaParser.on('callCellValue', function(cellCoord, done) {
       const cellValue = getFormulaParserCellValue(cellCoord);
       done(cellValue);
