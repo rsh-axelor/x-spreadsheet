@@ -17,6 +17,17 @@ export default class Dropdown extends Element {
       .css("width", width)
       .hide();
 
+    if (
+      title.iconNameEl &&
+      title.iconNameEl.el &&
+      title.iconNameEl.el.className === "x-spreadsheet-icon-img formula"
+    ) {
+      this.contentEl
+        .css("height", "fit-content")
+        .css("max-height", `calc(${window.innerHeight}px - 90px)`)
+        .css("overflow", "auto");
+    }
+    
     this.setContentChildren(...children);
 
     this.headerEl = h("div", `${cssPrefix}-dropdown-header`);
