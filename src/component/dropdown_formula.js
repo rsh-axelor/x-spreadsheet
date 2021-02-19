@@ -1,9 +1,9 @@
-import Dropdown from './dropdown';
-import Icon from './icon';
-import { h } from './element';
-import { cssPrefix } from '../config';
+import Dropdown from "./dropdown";
+import Icon from "./icon";
+import { h } from "./element";
+import { cssPrefix } from "../config";
 
-import { SUPPORTED_FORMULAS } from 'hot-formula-parser';
+import { SUPPORTED_FORMULAS } from "hot-formula-parser";
 
 export default class DropdownFormula extends Dropdown {
   constructor() {
@@ -13,7 +13,14 @@ export default class DropdownFormula extends Dropdown {
           this.hide();
           this.change(it);
         })
-      .child(it));
-    super(new Icon('formula'), '180px', true, 'bottom-left', ...nformulas);
+        .child(it)
+    );
+    super(
+      new Icon("formula"),
+      "fit-content",
+      true,
+      "bottom-left",
+      ...nformulas
+    );
   }
 }
