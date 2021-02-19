@@ -361,7 +361,6 @@ class Table {
         if (functionParams.toString() !== noQuotes) return "";
         let model = functionParams[0];
         let fields = functionParams[1].split(",").map((item) => item.trim());
-        // let _domain = "";
         let limit = Number(functionParams[2]) || 10;
         let _domain = functionParams[3];
         let data = {};
