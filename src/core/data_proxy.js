@@ -571,7 +571,7 @@ export default class DataProxy {
           }
         } else {
           const cell = rows.getCellOrNew(ri, ci);
-          cell.text = `=${value}()`;
+          cell.text = `=${value}(`;
         }
       } else {
         selector.range.each((ri, ci) => {
