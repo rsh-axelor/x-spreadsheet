@@ -7,6 +7,13 @@ module.exports = {
   entry: {
     xspreadsheet: './src/index.js',
   },
+  devServer: {
+    proxy: {
+        "/api": { target: "http://localhost:8081" ,
+        pathRewrite: {'^/api' : ''}
+      },
+    },
+  },
   module: {
     rules: [
       {
